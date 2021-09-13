@@ -14,7 +14,7 @@
   (let ((id -1))
     (incf id)
     (mapcar (lambda (row)
-              (list id (vector (mapcar #'nu/prepare-column-value row))))
+              (list id (apply #'vector (mapcar #'nu/prepare-column-value row))))
             rows)))
 
 (defvar nu/test-input
