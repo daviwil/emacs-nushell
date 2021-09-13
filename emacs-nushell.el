@@ -59,20 +59,12 @@ the values differ."
     (switch-to-buffer (current-buffer))))
 
 (defun nu/display-output (output-string)
-  (with-current-buffer (get-buffer-create "*nushell-output*")
-    (read-only-mode 0)
-    (delete-region (point-min) (point-max))
-    (let* ((rows (json-read-from-string (base64-decode-string output-string)))
-           (rows (if (and (not (arrayp rows))
-                          (json-alist-p rows))
-                     (vector rows)
-                   rows))
-           (cols (nu/infer-columns (aref rows 0))))
-      (message "COLS: %s" cols)
-      (setq tabulated-list-format cols)
-      (setq tabulated-list-entries (nu/format-rows rows)))
-    (switch-to-buffer (current-buffer))
-    (nushell-view-mode)))
+  (let* ((rows (json-read-from-string (base64-decode-string output-string)))
+         (rows (if (and (not (arrayp rows))
+                        (json-alist-p rows))
+                   (vector rows)
+                 rows)))
+    (nu/display-alist-vector rows)))
 
 (define-derived-mode nushell-view-mode tabulated-list-mode "Nushell Output"
   "Major mode for browsing Nushell result lists."
