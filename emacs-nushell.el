@@ -29,7 +29,7 @@
     (let* ((rows (json-read-from-string (base64-decode-string output-string)))
            (rows (if (and (not (arrayp rows))
                           (json-alist-p rows))
-                     (apply #'vector rows)
+                     (vector rows)
                    rows))
            (cols (nu/infer-columns (aref rows 0))))
       (message "COLS: %s" cols)
