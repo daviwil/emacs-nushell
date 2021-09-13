@@ -58,13 +58,30 @@ the values differ."
     (tabulated-list-print)
     (switch-to-buffer (current-buffer))))
 
-(defun nu/display-output (output-string)
-  (let* ((rows (json-read-from-string (base64-decode-string output-string)))
-         (rows (if (and (not (arrayp rows))
-                        (json-alist-p rows))
-                   (vector rows)
-                 rows)))
-    (nu/display-alist-vector rows)))
+(defun nu/display-output (data)
+  "Display DATA in a table.
+
+DATA must be either
+- a vector of association lists
+- an association list
+- a JSON encoded as a string
+- a base64 encoded JSON string.
+
+All other types will lead to an error."
+  (pcase data
+    ((pred stringp)
+     (nu/display-output
+      (json-read-from-string
+       (or (condition-case nil
+               ;; Try base64 decoding first
+               (base64-decode-string data)
+             (error nil))
+           data))))
+    ((pred json-alist-p)
+     (nu/display-output (vector json-data)))
+    ((pred vectorp)
+     (nu/display-alist-vector data))
+    (_ (signal 'wrong-type-argument nil))))
 
 (define-derived-mode nushell-view-mode tabulated-list-mode "Nushell Output"
   "Major mode for browsing Nushell result lists."
