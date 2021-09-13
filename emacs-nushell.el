@@ -1,3 +1,6 @@
+(require 'json)
+(require 'cl-lib)
+
 (defun nu/infer-columns (row)
   (apply #'vector
          (mapcar (lambda (col)
@@ -12,9 +15,9 @@
 
 (defun nu/format-rows (rows)
   (let ((id -1))
-    (incf id)
     (mapcar (lambda (row)
-              (list id (apply #'vector (mapcar #'nu/prepare-column-value row))))
+              (list (cl-incf id)
+                    (apply #'vector (mapcar #'nu/prepare-column-value row))))
             rows)))
 
 (defvar nu/test-input
